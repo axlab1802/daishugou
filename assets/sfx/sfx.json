@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "masterVolume": 0.7,
+  "sounds": {
+    "ui_select": {
+      "label": "カード選択",
+      "files": [
+        "assets/sfx/ui_select.wav",
+        "assets/sfx/ui_select.mp3"
+      ],
+      "volume": 0.5
+    },
+    "ui_deselect": {
+      "label": "カード選択解除",
+      "files": [
+        "assets/sfx/ui_deselect.wav",
+        "assets/sfx/ui_deselect.mp3"
+      ],
+      "volume": 0.5
+    },
+    "play": {
+      "label": "カードを出す",
+      "files": [
+        "assets/sfx/play.wav",
+        "assets/sfx/play.mp3"
+      ],
+      "volume": 0.6
+    },
+    "pass": {
+      "label": "パス",
+      "files": [
+        "assets/sfx/pass.wav",
+        "assets/sfx/pass.mp3"
+      ],
+      "volume": 0.6
+    },
+    "combo": {
+      "label": "コンボ発動",
+      "files": [
+        "assets/sfx/combo.wav",
+        "assets/sfx/combo.mp3"
+      ],
+      "volume": 0.75
+    },
+    "revolution": {
+      "label": "革命",
+      "files": [
+        "assets/sfx/revolution.wav",
+        "assets/sfx/revolution.mp3"
+      ],
+      "volume": 0.75
+    },
+    "field_clear": {
+      "label": "場流し",
+      "files": [
+        "assets/sfx/field_clear.wav",
+        "assets/sfx/field_clear.mp3"
+      ],
+      "volume": 0.65
+    },
+    "win": {
+      "label": "勝利",
+      "files": [
+        "assets/sfx/win.wav",
+        "assets/sfx/win.mp3"
+      ],
+      "volume": 0.8
+    },
+    "lose": {
+      "label": "敗北",
+      "files": [
+        "assets/sfx/lose.wav",
+        "assets/sfx/lose.mp3"
+      ],
+      "volume": 0.8
+    },
+    "start": {
+      "label": "ゲーム開始",
+      "files": [
+        "assets/sfx/start.wav",
+        "assets/sfx/start.mp3"
+      ],
+      "volume": 0.7
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "canvas": {
+    "width": 700,
+    "height": 1000,
+    "radius": 40,
+    "border": 6,
+    "innerBorder": 2,
+    "innerPadding": 20
+  },
+  "rankTop": {
+    "x": 90,
+    "y": 140,
+    "fontSize": 96,
+    "anchor": "start"
+  },
+  "rankBottom": {
+    "x": 90,
+    "y": 140,
+    "fontSize": 96,
+    "rotate": 180,
+    "translateX": 700,
+    "translateY": 1000,
+    "anchor": "start"
+  },
+  "rankColor": "#2b1a10",
+  "frame": {
+    "x": 110,
+    "y": 180,
+    "width": 480,
+    "height": 640,
+    "radius": 26
+  },
+  "art": {
+    "x": 134,
+    "y": 204,
+    "width": 432,
+    "height": 520,
+    "radius": 18
+  },
+  "title": {
+    "x": 350,
+    "y": 790,
+    "fontSize": 42
+  },
+  "titles": {
+    "2": "スピリタス",
+    "3": "水",
+    "4": "お茶割り",
+    "5": "炭酸割り",
+    "6": "レモンサワー",
+    "7": "ビール",
+    "8": "ハイボール",
+    "9": "ワイン",
+    "10": "日本酒",
+    "11": "焼酎",
+    "12": "ウイスキー",
+    "13": "テキーラ",
+    "A": "きよし"
+  }
+}
