@@ -106,9 +106,9 @@ const COMBOS = [
   },
 ];
 
-const RULES_URL = "./rules.json";
+const RULES_URL = "/rules.json";
 const RULES_STORAGE_KEY = "daishugou_rules_v1";
-const SFX_URL = "./assets/sfx/sfx.json";
+const SFX_URL = "/assets/sfx/sfx.json";
 const RULE_CATALOG_FALLBACK = [
   {
     id: "tequilaCounter",
@@ -333,10 +333,10 @@ function cardAssetKey(rank) {
 }
 
 function cardImagePath(card) {
-  if (card.rank === JOKER_RANK) return "assets/joker.png";
+  if (card.rank === JOKER_RANK) return "/assets/joker.png";
   const suitName = SUIT_NAME_MAP[card.suit] || "spade";
   const rankKey = cardAssetKey(card.rank);
-  return `assets/generated/card_${rankKey}_${suitName}.svg`;
+  return `/assets/generated/card_${rankKey}_${suitName}.svg`;
 }
 
 function strengthValue(rank) {
