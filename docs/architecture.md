@@ -3,13 +3,13 @@
 ## 1. 全体構成
 - フロントエンド: Vite + Vanilla JS
 - バックエンド: Vercel Serverless Functions（`/api/*`）
-- データストア: Vercel KV（Redis）
+- データストア: Vercel Redis（Upstash）
 
 ```
 Browser
   └─ Static Assets (Vite build)
        └─ /api/rooms/* (Serverless Functions)
-             └─ Vercel KV (Room/Game State)
+             └─ Vercel Redis (Room/Game State)
 ```
 
 ## 2. コンポーネント
@@ -30,10 +30,10 @@ Browser
 
 ### 2.3 共通ロジック
 - `lib/game.js`: ゲームルール/判定
-- `lib/roomStore.js`: KVアクセス/TTL/ロック
+- `lib/roomStore.js`: Redisアクセス/TTL/ロック
 - `lib/http.js`: JSON入出力
 
-## 3. データ設計（KV）
+## 3. データ設計（Redis）
 
 ### 3.1 キー
 - `room:{code}`: ルーム情報（JSON）

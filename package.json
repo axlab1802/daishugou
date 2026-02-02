@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vercel/kv": "^2.0.0"
+    "redis": "^4.7.0"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

@@ -21,7 +21,7 @@ API付きで動かす場合は `http://localhost:3000` のAPIを使用します�
 ## 使い方（Vercel）
 - `npm run build` で `dist/` を生成
 - `vercel.json` に従って静的配信 + `/api/*` をFunctionsとして動作
-- Vercel KV の環境変数を設定
+- Vercel Redis の `REDIS_URL` を環境変数に設定
 
 ## ディレクトリ構成
 - `index.html` 画面構造

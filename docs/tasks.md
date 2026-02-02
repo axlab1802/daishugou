@@ -29,6 +29,6 @@
 
 ## 5. デプロイ設定
 - [x] `vercel.json` 追加
-- [x] `@vercel/kv` 依存追加
-- [ ] Vercel 環境変数の整理（KV接続情報）
+- [x] `redis` 依存追加
+- [ ] Vercel 環境変数の整理（REDIS_URL）
 - [ ] 本番動作確認
