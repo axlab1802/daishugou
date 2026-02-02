@@ -1,32 +1,19 @@
 # API仕様
 
-## 1. 方針
-- 現状はクライアントのみで動作
-- 将来のオンライン対戦に備え、APIの案を定義
-- 形式: JSON
+## 共通
+- Base Path: `/api`
+- Content-Type: `application/json`
+- レスポンス形式: `{ ok: boolean, ... }`
 
-## 2. エンドポイント一覧（案）
+## 1. ルーム作成
+`POST /api/rooms`
 
-### 2.1 ルーム作成
-- `POST /api/rooms`
-- Request
+### Request
 ```json
 {
-  "ownerName": "A",
-  "maxPlayers": 4,
-  "turnTimeLimitSec": 30,
-  "rules": {
-    "tequilaCounter": true,
-    "ochokoReset": true,
-    "kanpaiBonus": true
-  }
-}
-```
-- Response
-```json
-{
-  "roomCode": "483921",
-  "ownerId": "p_owner",
+  "ownerName": "string",
+  "maxPlayers": 2,
+  "turnTimeLimitSec": null,
   "rules": {
     "tequilaCounter": true,
     "ochokoReset": true,
@@ -35,92 +22,111 @@
 }
 ```
 
-### 2.2 参加
-- `POST /api/rooms/{roomCode}/join`
-- Request
+### Response
 ```json
 {
-  "name": "B"
-}
-```
-- Response
-```json
-{
-  "playerId": "p2"
+  "ok": true,
+  "roomCode": "123456",
+  "ownerId": "p_xxx",
+  "playerId": "p_xxx",
+  "rules": { "tequilaCounter": true }
 }
 ```
 
-### 2.3 退出
-- `POST /api/rooms/{roomCode}/leave`
-- Request
+## 2. ルーム参加
+`POST /api/rooms/{room}/join`
+
+### Request
 ```json
-{
-  "playerId": "p2"
-}
+{ "name": "string" }
 ```
 
-### 2.4 ゲーム開始
-- `POST /api/rooms/{roomCode}/start`
-- Request
+### Response
 ```json
-{
-  "ownerId": "p_owner"
-}
+{ "ok": true, "playerId": "p_xxx" }
 ```
 
-### 2.5 状態取得（ポーリング）
-- `GET /api/rooms/{roomCode}/state?playerId={playerId}`
-- Response
+## 3. ルーム退出
+`POST /api/rooms/{room}/leave`
+
+### Request
+```json
+{ "playerId": "p_xxx" }
+```
+
+### Response
+```json
+{ "ok": true }
+```
+
+## 4. 状態取得
+`GET /api/rooms/{room}/state?playerId={playerId}`
+
+### Response
 ```json
 {
-  "stateVersion": 12,
-  "phase": "playing",
-  "rules": {
-    "tequilaCounter": true,
-    "ochokoReset": true,
-    "kanpaiBonus": true
+  "ok": true,
+  "room": {
+    "roomCode": "123456",
+    "ownerId": "p_xxx",
+    "phase": "lobby|playing|finished",
+    "maxPlayers": 6,
+    "stateVersion": 12,
+    "rules": { "tequilaCounter": true },
+    "players": [
+      { "playerId": "p_xxx", "name": "A", "handCount": 8 }
+    ],
+    "game": {
+      "field": [],
+      "revolution": false,
+      "currentTurnPlayerId": "p_xxx",
+      "gameOver": false,
+      "ranking": [],
+      "fieldMeta": null
+    },
+    "log": [ { "at": 0, "text": "" } ],
+    "serverTime": 0
   },
-  "game": {
-    "currentTurnPlayerId": "p1",
-    "field": [],
-    "revolution": false,
-    "turnDeadlineAt": null
-  },
-  "players": [
-    { "playerId": "p1", "name": "A", "disconnected": false, "handCount": 8 },
-    { "playerId": "p2", "name": "B", "disconnected": false, "handCount": 9 }
-  ],
   "yourHand": []
 }
 ```
 
-### 2.6 アクション送信
-- `POST /api/rooms/{roomCode}/action`
-- Request
+## 5. ゲーム開始
+`POST /api/rooms/{room}/start`
+
+### Request
 ```json
-{
-  "playerId": "p1",
-  "type": "play",
-  "cardIds": ["7-0", "7-2"]
-}
-```
-- Response
-```json
-{
-  "ok": true,
-  "stateVersion": 13
-}
+{ "ownerId": "p_xxx" }
 ```
 
-## 3. エラーレスポンス
+### Response
 ```json
-{
-  "ok": false,
-  "error": "ROOM_NOT_FOUND"
-}
+{ "ok": true }
 ```
 
-## 4. データ構造
-- docs/specification.md の RoomState 定義を採用
-- カードは `rank` で強さを判定し、ジョーカーは `rank: 16`（1枚のみ、2より強い）
-- ジョーカーの例: `{ "id": "joker", "rank": 16, "name": "ジョーカー", "suit": "joker" }`
+## 6. アクション
+`POST /api/rooms/{room}/action`
+
+### Request
+```json
+{ "playerId": "p_xxx", "type": "play", "cardIds": ["3-0"] }
+```
+
+### Response
+```json
+{ "ok": true, "stateVersion": 13 }
+```
+
+## 7. エラーコード
+- `ROOM_NOT_FOUND`
+- `ROOM_ALREADY_STARTED`
+- `ROOM_FULL`
+- `ROOM_NOT_PLAYING`
+- `PLAYER_NOT_FOUND`
+- `NOT_OWNER`
+- `NOT_ENOUGH_PLAYERS`
+- `NOT_YOUR_TURN`
+- `INVALID_PLAY`
+- `CARD_NOT_OWNED`
+- `FIELD_EMPTY`
+- `ROOM_BUSY`

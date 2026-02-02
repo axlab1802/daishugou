@@ -108,7 +108,10 @@ const COMBOS = [
 
 const RULES_URL = "./rules.json";
 const RULES_STORAGE_KEY = "daishugou_rules_v1";
+const NICKNAME_STORAGE_KEY = "daishugou_nickname_v1";
 const SFX_URL = "./assets/sfx/sfx.json";
+const POLL_INTERVAL_MS = 800;
+const POLL_MAX_INTERVAL_MS = 2000;
 const RULE_CATALOG_FALLBACK = [
   {
     id: "tequilaCounter",
@@ -230,8 +233,18 @@ const state = {
     ownerId: null,
     phase: "lobby",
     pollingId: null,
+    pollingDelay: POLL_INTERVAL_MS,
   },
 };
+
+function loadNickname() {
+  return localStorage.getItem(NICKNAME_STORAGE_KEY) || "";
+}
+
+function saveNickname(name) {
+  if (!name) return;
+  localStorage.setItem(NICKNAME_STORAGE_KEY, name);
+}
 
 const elements = {
   playerCount: document.getElementById("player-count"),
@@ -1304,23 +1317,32 @@ function updateLobbyPlayers(room) {
 }
 
 async function apiRequest(path, method, body) {
-  const res = await fetch(path, {
-    method,
-    headers: { "Content-Type": "application/json" },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  const data = await res.json();
-  if (!res.ok || data.ok === false) {
+  const maxRetries = 2;
+  for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
+    const res = await fetch(path, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const data = await res.json();
+    if (res.ok && data.ok !== false) {
+      return data;
+    }
     const message = data.reason || data.error || "API_ERROR";
+    if (message === "ROOM_BUSY" && attempt < maxRetries) {
+      await new Promise((resolve) => setTimeout(resolve, 200 * (attempt + 1)));
+      continue;
+    }
     throw new Error(message);
   }
-  return data;
+  throw new Error("API_ERROR");
 }
 
 async function createRoom() {
   const name = elements.onlineName.value.trim() || "Player";
   const maxPlayers = Number(elements.onlineMax.value);
   try {
+    saveNickname(name);
     setOnlineStatus("ルーム作成中...");
     const data = await apiRequest("/api/rooms", "POST", {
       ownerName: name,
@@ -1347,6 +1369,7 @@ async function joinRoom() {
     return;
   }
   try {
+    saveNickname(name);
     setOnlineStatus("参加中...");
     const data = await apiRequest(`/api/rooms/${roomCode}/join`, "POST", { name });
     state.online.roomCode = roomCode;
@@ -1475,20 +1498,35 @@ async function fetchOnlineState() {
       "GET"
     );
     applyOnlineState(data);
+    return true;
   } catch (error) {
     setOnlineStatus(`エラー: ${error.message}`);
+    return false;
   }
 }
 
 function startPolling() {
   stopPolling();
-  fetchOnlineState();
-  state.online.pollingId = setInterval(fetchOnlineState, 800);
+  state.online.pollingDelay = POLL_INTERVAL_MS;
+  const tick = async () => {
+    const ok = await fetchOnlineState();
+    if (!state.online.pollingId) return;
+    if (!ok) {
+      state.online.pollingDelay = Math.min(
+        POLL_MAX_INTERVAL_MS,
+        state.online.pollingDelay + 400
+      );
+    } else {
+      state.online.pollingDelay = POLL_INTERVAL_MS;
+    }
+    state.online.pollingId = setTimeout(tick, state.online.pollingDelay);
+  };
+  state.online.pollingId = setTimeout(tick, 0);
 }
 
 function stopPolling() {
   if (state.online.pollingId) {
-    clearInterval(state.online.pollingId);
+    clearTimeout(state.online.pollingId);
     state.online.pollingId = null;
   }
 }
@@ -1548,6 +1586,11 @@ async function init() {
   elements.joinRoom.addEventListener("click", joinRoom);
   elements.leaveRoom.addEventListener("click", leaveRoom);
   elements.onlineStart.addEventListener("click", startOnlineGame);
+
+  const storedName = loadNickname();
+  if (storedName && elements.onlineName) {
+    elements.onlineName.value = storedName;
+  }
 
   setMode("local");
 }

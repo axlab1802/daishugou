@@ -641,5 +641,39 @@ body.is-game-active .combo-hint {
       "field"
       "right"
       "bottom";
+    gap: 12px;
+  }
+
+  .seat {
+    min-height: 90px;
+    padding: 10px;
+  }
+
+  .seat__hand .card-back {
+    width: 22px;
+    height: 32px;
+  }
+
+  .field-area__cards {
+    min-height: 120px;
+    gap: 10px;
+  }
+
+  .card,
+  .card-back {
+    width: clamp(60px, 18vw, 88px);
+    height: clamp(86px, 26vw, 128px);
+  }
+
+  .card.is-selected {
+    transform: translateY(-16px) scale(1.2);
+  }
+
+  .card__frame {
+    height: 56px;
+  }
+
+  .card__art-title {
+    font-size: 12px;
   }
 }
