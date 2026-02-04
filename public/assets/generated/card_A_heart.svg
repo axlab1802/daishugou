@@ -19,9 +19,11 @@
 
   <g font-family="Garamond, serif" font-weight="700" fill="#2b1a10">
     <text x="90" y="140" font-size="96" text-anchor="start">A</text>
+    <text x="160" y="140" font-size="96" text-anchor="start">きよし</text>
   </g>
   <g transform="translate(700 1000) rotate(180)" font-family="Garamond, serif" font-weight="700" fill="#2b1a10">
     <text x="90" y="140" font-size="96" text-anchor="start">A</text>
+    <text x="160" y="140" font-size="96" text-anchor="start">きよし</text>
   </g>
 
   <rect x="110" y="180" width="480" height="640" rx="26" fill="url(#frameWood)" stroke="#3c2516" stroke-width="4" />

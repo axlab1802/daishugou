@@ -13,6 +13,12 @@
     "fontSize": 96,
     "anchor": "start"
   },
+  "rankTitleTop": {
+    "x": 160,
+    "y": 140,
+    "fontSize": 96,
+    "anchor": "start"
+  },
   "rankBottom": {
     "x": 90,
     "y": 140,
@@ -20,6 +26,12 @@
     "rotate": 180,
     "translateX": 700,
     "translateY": 1000,
+    "anchor": "start"
+  },
+  "rankTitleBottom": {
+    "x": 160,
+    "y": 140,
+    "fontSize": 96,
     "anchor": "start"
   },
   "rankColor": "#2b1a10",

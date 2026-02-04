@@ -27,6 +27,8 @@ def svg_for_card(layout: dict, rank_key: str, image_href: str) -> str:
     art = layout["art"]
     rank_top = layout["rankTop"]
     rank_bottom = layout["rankBottom"]
+    rank_title_top = layout.get("rankTitleTop")
+    rank_title_bottom = layout.get("rankTitleBottom")
     title = layout["title"]
     rank_color = layout.get("rankColor", "#2b1a10")
     rank_top_anchor = rank_top.get("anchor", "middle")
@@ -34,6 +36,23 @@ def svg_for_card(layout: dict, rank_key: str, image_href: str) -> str:
 
     label = rank_label(rank_key)
     title_text = layout.get("titles", {}).get(rank_key, label)
+
+    rank_title_top_text = ""
+    rank_title_bottom_text = ""
+    if rank_title_top:
+        top_size = rank_title_top.get("fontSize", rank_top["fontSize"])
+        top_anchor = rank_title_top.get("anchor", rank_top_anchor)
+        rank_title_top_text = (
+            f'<text x="{rank_title_top["x"]}" y="{rank_title_top["y"]}" '
+            f'font-size="{top_size}" text-anchor="{top_anchor}">{title_text}</text>'
+        )
+    if rank_title_bottom:
+        bottom_size = rank_title_bottom.get("fontSize", rank_bottom["fontSize"])
+        bottom_anchor = rank_title_bottom.get("anchor", rank_bottom_anchor)
+        rank_title_bottom_text = (
+            f'<text x="{rank_title_bottom["x"]}" y="{rank_title_bottom["y"]}" '
+            f'font-size="{bottom_size}" text-anchor="{bottom_anchor}">{title_text}</text>'
+        )
 
     inner_x = canvas["innerPadding"] * 2
     inner_y = canvas["innerPadding"] * 2
@@ -61,9 +80,11 @@ def svg_for_card(layout: dict, rank_key: str, image_href: str) -> str:
 
   <g font-family=\"Garamond, serif\" font-weight=\"700\" fill=\"{rank_color}\">
     <text x=\"{rank_top['x']}\" y=\"{rank_top['y']}\" font-size=\"{rank_top['fontSize']}\" text-anchor=\"{rank_top_anchor}\">{label}</text>
+    {rank_title_top_text}
   </g>
   <g transform=\"translate({rank_bottom['translateX']} {rank_bottom['translateY']}) rotate({rank_bottom['rotate']})\" font-family=\"Garamond, serif\" font-weight=\"700\" fill=\"{rank_color}\">
     <text x=\"{rank_bottom['x']}\" y=\"{rank_bottom['y']}\" font-size=\"{rank_bottom['fontSize']}\" text-anchor=\"{rank_bottom_anchor}\">{label}</text>
+    {rank_title_bottom_text}
   </g>
 
   <rect x=\"{frame['x']}\" y=\"{frame['y']}\" width=\"{frame['width']}\" height=\"{frame['height']}\" rx=\"{frame['radius']}\" fill=\"url(#frameWood)\" stroke=\"#3c2516\" stroke-width=\"4\" />
