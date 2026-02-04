@@ -565,16 +565,8 @@ body.is-game-active .combo-hint {
 }
 
 .card-back::after {
-  content: "Y";
-  position: absolute;
-  inset: 18px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  display: grid;
-  place-items: center;
-  font-size: 22px;
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 700;
+  content: "";
+  display: none;
 }
 
 .card__suit {
