@@ -382,6 +382,10 @@ body.is-game-active .combo-hint {
   gap: 16px;
 }
 
+.player-area .action-bar {
+  margin-top: 16px;
+}
+
 .btn {
   border: none;
   padding: 12px 22px;
@@ -619,12 +623,9 @@ body.is-game-active .combo-hint {
 }
 
 @media (max-width: 720px) {
-  .action-bar {
-    flex-direction: column;
-  }
-
-  .card-row {
-    justify-content: center;
+  .app {
+    padding: 14px 12px 18px;
+    gap: 12px;
   }
 
   .info-bar {
@@ -632,41 +633,97 @@ body.is-game-active .combo-hint {
   }
 
   .table-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-areas:
-      "top-left"
-      "top"
-      "top-right"
-      "left"
-      "field"
-      "right"
-      "bottom";
-    gap: 12px;
+      "top-left top top-right"
+      "left field right";
+    gap: 8px;
+    align-items: stretch;
   }
 
   .seat {
-    min-height: 90px;
-    padding: 10px;
+    min-height: 64px;
+    padding: 6px;
+    border-radius: 10px;
+    gap: 4px;
+  }
+
+  .seat__name {
+    font-size: 12px;
+  }
+
+  .seat__count {
+    font-size: 11px;
+  }
+
+  .seat__hand {
+    gap: 4px;
   }
 
   .seat__hand .card-back {
-    width: 22px;
-    height: 32px;
+    width: 16px;
+    height: 22px;
+    border-radius: 4px;
+  }
+
+  .seat--bottom {
+    display: none;
+  }
+
+  .field-area {
+    padding: 8px;
+    border-radius: 10px;
+  }
+
+  .field-area__header {
+    display: none;
   }
 
   .field-area__cards {
-    min-height: 120px;
+    min-height: 80px;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .player-area {
+    padding: 12px;
+    position: relative;
+    padding-bottom: 72px;
+  }
+
+  .player-area .section-title {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .card-row {
+    justify-content: center;
     gap: 10px;
   }
 
   .card,
   .card-back {
-    width: clamp(60px, 18vw, 88px);
-    height: clamp(86px, 26vw, 128px);
+    width: clamp(56px, 18vw, 82px);
+    height: clamp(80px, 26vw, 120px);
   }
 
   .card.is-selected {
-    transform: translateY(-16px) scale(1.2);
+    transform: translateY(-14px) scale(1.18);
+  }
+
+  .action-bar {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 2;
+  }
+
+  .action-bar .btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    min-width: 88px;
   }
 
   .card__frame {
