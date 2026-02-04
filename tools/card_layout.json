@@ -14,7 +14,7 @@
     "anchor": "start"
   },
   "rankTitleTop": {
-    "x": 160,
+    "x": 180,
     "y": 140,
     "fontSize": 96,
     "anchor": "start"
@@ -29,7 +29,7 @@
     "anchor": "start"
   },
   "rankTitleBottom": {
-    "x": 160,
+    "x": 180,
     "y": 140,
     "fontSize": 96,
     "anchor": "start"
@@ -66,7 +66,7 @@
     "10": "日本酒",
     "11": "焼酎",
     "12": "ウイスキー",
-    "13": "テキーラ",
-    "A": "きよし"
+    "13": "ウォッカ",
+    "A": "テキーラ"
   }
 }
