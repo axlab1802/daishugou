@@ -30,5 +30,6 @@
 ## 5. デプロイ設定
 - [x] `vercel.json` 追加
 - [x] `redis` 依存追加
+- [x] 本番のカード画像が表示されない問題を修正（public/assets 配置）
 - [ ] Vercel 環境変数の整理（REDIS_URL）
 - [ ] 本番動作確認

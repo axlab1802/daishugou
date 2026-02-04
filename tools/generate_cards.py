@@ -96,7 +96,7 @@ def generate_all(layout_path: Path, assets_dir: Path, output_dir: Path) -> None:
 if __name__ == "__main__":
     root = Path(__file__).resolve().parent.parent
     layout_path = root / "tools" / "card_layout.json"
-    assets_dir = root / "assets"
+    assets_dir = root / "public" / "assets"
     output_dir = assets_dir / "generated"
     generate_all(layout_path, assets_dir, output_dir)
     print(f"Generated cards in {output_dir}")
