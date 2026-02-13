@@ -24,19 +24,14 @@ module.exports = async function handler(req, res) {
     const result = await withRoomLock(GLOBAL_ROOM_CODE, async () => {
       let room = await getRoom(GLOBAL_ROOM_CODE);
       
-      // ルームが存在しない場合は作成
-      if (!room) {
+      // ルームが存在しない、またはゲームが終了/開始済みの場合はリセット
+      if (!room || room.phase !== "lobby") {
         const catalog = loadRuleCatalog();
         const defaults = getDefaultRuleConfig(catalog);
         const rules = normalizeRuleConfig(catalog, defaults);
         
         room = createRoom(name, MAX_PLAYERS, null, rules);
         room.roomCode = GLOBAL_ROOM_CODE;
-      }
-      
-      // ゲームが既に開始している場合は参加不可
-      if (room.phase !== "lobby") {
-        return { status: 409, data: { ok: false, error: "GAME_ALREADY_STARTED" } };
       }
       
       // 満員かチェック
