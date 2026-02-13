@@ -268,6 +268,7 @@ const elements = {
   joinMultiplayer: document.getElementById("join-multiplayer"),
   startMultiplayer: document.getElementById("start-multiplayer"),
   startGame: document.getElementById("start-game"),
+  resetRoom: document.getElementById("reset-room"),
   leaveRoom: document.getElementById("leave-room"),
   onlineStatus: document.getElementById("online-status"),
   onlinePlayers: document.getElementById("online-players"),
@@ -1449,6 +1450,20 @@ async function leaveRoom() {
   } catch (error) {
     // ignore
   }
+  resetAfterLeave();
+}
+
+async function resetRoom() {
+  if (!state.online.roomCode) return;
+  try {
+    await apiRequest("/api/multiplayer/reset", "POST", {});
+  } catch (error) {
+    // ignore
+  }
+  resetAfterLeave();
+}
+
+function resetAfterLeave() {
   stopPolling();
   state.online.roomCode = null;
   state.online.playerId = null;
@@ -1461,6 +1476,7 @@ async function leaveRoom() {
   const hasName = elements.onlineName.value.trim().length > 0;
   elements.joinMultiplayer.style.display = hasName ? "inline-block" : "none";
   elements.startGame.style.display = "none";
+  elements.resetRoom.style.display = "none";
   elements.leaveRoom.style.display = "none";
   
   setOnlineStatus("退出しました");
@@ -1511,6 +1527,7 @@ function applyOnlineState(data) {
       elements.startGame.style.display = "none";
       setOnlineStatus(`${room.players.length}人待機中...`);
     }
+    elements.resetRoom.style.display = "inline-block";
     
     return;
   }
@@ -1658,6 +1675,7 @@ async function init() {
   elements.modeOnline.addEventListener("click", () => setMode("online"));
   elements.joinMultiplayer.addEventListener("click", joinMultiplayer);
   elements.startGame.addEventListener("click", startOnlineGame);
+  elements.resetRoom.addEventListener("click", resetRoom);
   elements.leaveRoom.addEventListener("click", leaveRoom);
 
   // 名前入力欄のイベントリスナー
