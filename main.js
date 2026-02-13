@@ -1296,7 +1296,6 @@ function resetOnlineState() {
   state.lastAction = null;
   state.rules.config = { ...state.rules.localConfig };
   setMessage("ロビー待機中");
-  elements.onlineStart.disabled = true;
   renderRuleSettings();
   updateRuleSettingsAvailability();
   setGameActive(false);
@@ -1372,50 +1371,6 @@ async function joinMultiplayer() {
     elements.joinMultiplayer.style.display = "none";
     elements.leaveRoom.style.display = "inline-block";
     
-    startPolling();
-  } catch (error) {
-    setOnlineStatus(`エラー: ${error.message}`);
-  }
-}
-
-async function createRoom() {
-  const name = elements.onlineName.value.trim() || "Player";
-  const maxPlayers = Number(elements.onlineMax.value);
-  try {
-    saveNickname(name);
-    setOnlineStatus("ルーム作成中...");
-    const data = await apiRequest("/api/rooms", "POST", {
-      ownerName: name,
-      maxPlayers,
-      rules: state.rules.config,
-    });
-    state.online.roomCode = data.roomCode;
-    state.online.playerId = data.playerId;
-    state.online.ownerId = data.ownerId;
-    elements.onlineRoom.value = data.roomCode;
-    setOnlineStatus(`ルーム作成: ${data.roomCode}`);
-    updateRuleSettingsAvailability();
-    startPolling();
-  } catch (error) {
-    setOnlineStatus(`エラー: ${error.message}`);
-  }
-}
-
-async function joinRoom() {
-  const name = elements.onlineName.value.trim() || "Player";
-  const roomCode = elements.onlineRoom.value.trim();
-  if (!roomCode) {
-    setOnlineStatus("ルームコードを入力してください");
-    return;
-  }
-  try {
-    saveNickname(name);
-    setOnlineStatus("参加中...");
-    const data = await apiRequest(`/api/rooms/${roomCode}/join`, "POST", { name });
-    state.online.roomCode = roomCode;
-    state.online.playerId = data.playerId;
-    setOnlineStatus(`参加完了: ${roomCode}`);
-    updateRuleSettingsAvailability();
     startPolling();
   } catch (error) {
     setOnlineStatus(`エラー: ${error.message}`);
