@@ -1469,6 +1469,7 @@ function resetAfterLeave() {
   state.online.playerId = null;
   state.online.ownerId = null;
   resetOnlineState();
+  elements.onlinePlayers.innerHTML = "";
   renderAll();
   
   // UI状態をリセット
