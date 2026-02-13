@@ -618,12 +618,15 @@ function updateRuleSettingsAvailability() {
   });
 }
 
+const COPIES_PER_CARD = 8;
+
 function createDeck() {
   const deck = [];
   CARD_SPECS.forEach((spec) => {
-    SUITS.forEach((suit, index) => {
+    for (let i = 0; i < COPIES_PER_CARD; i++) {
+      const suit = SUITS[i % SUITS.length];
       deck.push({
-        id: `${spec.rank}-${index}`,
+        id: `${spec.rank}-${i}`,
         rank: spec.rank,
         displayRank: displayRank(spec.rank),
         name: spec.name,
@@ -633,7 +636,7 @@ function createDeck() {
         artTitle: "中世風の油絵",
         artSub: spec.name,
       });
-    });
+    }
   });
   deck.push({ ...JOKER_CARD });
   return deck;
@@ -674,7 +677,7 @@ function dealHands(cpuCount) {
   setupPlayers(cpuCount);
   const deck = shuffle(createDeck());
   state.players.forEach((player) => {
-    player.hand = deck.splice(0, 10);
+    player.hand = deck.splice(0, 13);
     player.finished = false;
   });
   ensurePlayerHasBeer(state.players[0].hand, deck);
