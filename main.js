@@ -1402,6 +1402,8 @@ async function joinRoom() {
     setOnlineStatus(`参加完了: ${roomCode}`);
     updateRuleSettingsAvailability();
     startPolling();
+  } catch (error) {
+    setOnlineStatus(`エラー: ${error.message}`);
   }
 }
 
