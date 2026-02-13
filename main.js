@@ -282,12 +282,6 @@ function setGameActive(active) {
 
 function playSfx(id) {
   if (!state.sfx.enabled) return;
-  if (id === "play") {
-    const putIndex = Math.floor(Math.random() * 6) + 1;
-    const sound = state.sfx.sounds[`put${putIndex}`];
-    if (sound) sound.play();
-    return;
-  }
   const sound = state.sfx.sounds[id];
   if (!sound) return;
   sound.play();

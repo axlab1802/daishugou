@@ -4,10 +4,7 @@
   "sounds": {
     "ui_select": {
       "label": "カード選択",
-      "files": [
-        "assets/sfx/ui_select.wav",
-        "assets/sfx/ui_select.mp3"
-      ],
+      "files": ["assets/sfx/sounds/put/attack.wav"],
       "volume": 0.5
     },
     "ui_deselect": {
@@ -18,34 +15,9 @@
       ],
       "volume": 0.5
     },
-    "put1": {
-      "label": "カードを出す1",
-      "files": ["assets/sfx/sounds/put/attack.wav"],
-      "volume": 0.6
-    },
-    "put2": {
-      "label": "カードを出す2",
-      "files": ["assets/sfx/sounds/put/attack2.wav"],
-      "volume": 0.6
-    },
-    "put3": {
-      "label": "カードを出す3",
-      "files": ["assets/sfx/sounds/put/jumon.wav"],
-      "volume": 0.6
-    },
-    "put4": {
-      "label": "カードを出す4",
-      "files": ["assets/sfx/sounds/put/kaisin.wav"],
-      "volume": 0.6
-    },
-    "put5": {
-      "label": "カードを出す5",
-      "files": ["assets/sfx/sounds/put/sido.wav"],
-      "volume": 0.6
-    },
-    "put6": {
-      "label": "カードを出す6",
-      "files": ["assets/sfx/sounds/put/zoma.wav"],
+    "play": {
+      "label": "カードを出す",
+      "files": ["assets/sfx/sounds/dasu.wav"],
       "volume": 0.6
     },
     "pass": {
