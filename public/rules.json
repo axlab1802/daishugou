@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "tequilaCounter",
+      "name": "テキーラ返し",
+      "description": "テキーラの単騎後に水2枚で返すと、テキーラを出した相手にランダム1枚を送る",
+      "defaultEnabled": true,
+      "implemented": true
+    },
+    {
+      "id": "ochokoReset",
+      "name": "おちょこリセット",
+      "description": "日本酒3枚で場流しし、同じプレイヤーから再開",
+      "defaultEnabled": true,
+      "implemented": true
+    },
+    {
+      "id": "kanpaiBonus",
+      "name": "乾杯ボーナス",
+      "description": "ビール単騎の次にワイン単騎を出すと、場流しして同じプレイヤーが続けて出せる",
+      "defaultEnabled": true,
+      "implemented": true
+    },
+    {
+      "id": "chaserMandatory",
+      "name": "チェイサー強制",
+      "description": "強カードの後は水を含めないと出せない",
+      "defaultEnabled": false,
+      "implemented": false
+    },
+    {
+      "id": "mixingPenalty",
+      "name": "飲み合わせペナルティ",
+      "description": "革命後はハイボール/炭酸割りの単騎が不可",
+      "defaultEnabled": false,
+      "implemented": false
+    },
+    {
+      "id": "careCounter",
+      "name": "介抱カウンター",
+      "description": "介抱セットで勝つと次の手番はコンボ不可",
+      "defaultEnabled": false,
+      "implemented": false
+    },
+    {
+      "id": "muddyDraw",
+      "name": "泥酔ドロー",
+      "description": "泥酔コンボ成立時、勝者1枚引き・相手1枚捨て",
+      "defaultEnabled": false,
+      "implemented": false
+    },
+    {
+      "id": "chaserReverse",
+      "name": "チェイサー逆送",
+      "description": "レモンサワー単騎後に水2枚で返すと、相手にランダム1枚を送る",
+      "defaultEnabled": false,
+      "implemented": false
+    },
+    {
+      "id": "shochuLock",
+      "name": "焼酎ロック",
+      "description": "焼酎2枚で次の手番の選択を制限",
+      "defaultEnabled": false,
+      "implemented": false
+    },
+    {
+      "id": "spiritusStun",
+      "name": "スピリタスの気絶",
+      "description": "2が出た後は次の手番が強制パス",
+      "defaultEnabled": false,
+      "implemented": false
+    },
+    {
+      "id": "jokerSolitude",
+      "name": "ジョーカー孤高",
+      "description": "ジョーカーで勝つと場流し＆次の手番は次プレイヤー",
+      "defaultEnabled": false,
+      "implemented": false
+    },
+    {
+      "id": "kiyoshiLecture",
+      "name": "きよしの説教",
+      "description": "きよし後は同ランクのみで返す",
+      "defaultEnabled": false,
+      "implemented": false
+    }
+  ]
+}
