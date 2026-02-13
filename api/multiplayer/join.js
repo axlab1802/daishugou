@@ -65,12 +65,6 @@ module.exports = async function handler(req, res) {
       room.stateVersion += 1;
       room.log.push({ at: now, text: `${finalName} が参加` });
       
-      // 2人以上集まったら自動でゲーム開始
-      if (room.players.length >= 2 && room.phase === "lobby") {
-        const { startGame } = require("../../lib/game");
-        startGame(room);
-      }
-      
       await saveRoom(room);
       
       return { 

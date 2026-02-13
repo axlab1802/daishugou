@@ -266,6 +266,8 @@ const elements = {
   onlineControls: document.getElementById("online-controls"),
   onlineName: document.getElementById("online-name"),
   joinMultiplayer: document.getElementById("join-multiplayer"),
+  startMultiplayer: document.getElementById("start-multiplayer"),
+  startGame: document.getElementById("start-game"),
   leaveRoom: document.getElementById("leave-room"),
   onlineStatus: document.getElementById("online-status"),
   onlinePlayers: document.getElementById("online-players"),
@@ -1419,6 +1421,21 @@ async function joinRoom() {
   }
 }
 
+async function startOnlineGame() {
+  if (!state.online.roomCode || !state.online.playerId) return;
+  try {
+    const endpoint = state.online.roomCode === "global"
+      ? "/api/multiplayer/start"
+      : `/api/rooms/${state.online.roomCode}/start`;
+    
+    await apiRequest(endpoint, "POST", {
+      playerId: state.online.playerId,
+    });
+  } catch (error) {
+    setOnlineStatus(`エラー: ${error.message}`);
+  }
+}
+
 async function leaveRoom() {
   if (!state.online.roomCode || !state.online.playerId) return;
   try {
@@ -1443,7 +1460,7 @@ async function leaveRoom() {
   elements.onlineName.disabled = false;
   const hasName = elements.onlineName.value.trim().length > 0;
   elements.joinMultiplayer.style.display = hasName ? "inline-block" : "none";
-  elements.startMultiplayer.style.display = hasName ? "none" : "inline-block";
+  elements.startGame.style.display = "none";
   elements.leaveRoom.style.display = "none";
   
   setOnlineStatus("退出しました");
@@ -1485,6 +1502,16 @@ function applyOnlineState(data) {
     state.currentIndex = 0;
     setMessage("ロビー待機中");
     renderAll();
+    
+    // ゲーム開始ボタンの表示制御
+    if (room.players.length >= 2) {
+      elements.startGame.style.display = "inline-block";
+      setOnlineStatus(`${room.players.length}人集合 - ゲーム開始可能`);
+    } else {
+      elements.startGame.style.display = "none";
+      setOnlineStatus(`${room.players.length}人待機中...`);
+    }
+    
     return;
   }
 
@@ -1630,6 +1657,7 @@ async function init() {
   elements.modeLocal.addEventListener("click", () => setMode("local"));
   elements.modeOnline.addEventListener("click", () => setMode("online"));
   elements.joinMultiplayer.addEventListener("click", joinMultiplayer);
+  elements.startGame.addEventListener("click", startOnlineGame);
   elements.leaveRoom.addEventListener("click", leaveRoom);
 
   // 名前入力欄のイベントリスナー
