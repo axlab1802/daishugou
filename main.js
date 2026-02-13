@@ -1514,12 +1514,15 @@ function applyOnlineState(data) {
   if (state.gameOver) {
     setGameActive(false);
     setMessage("ゲーム終了");
+    setOnlineStatus("ゲーム終了");
   } else if (state.currentIndex === 0) {
     setGameActive(true);
-    setMessage("あなたのターンです");
+    setMessage("あなたの番です");
+    setOnlineStatus("あなたの番です");
   } else if (state.currentIndex >= 0) {
     setGameActive(true);
     setMessage(`${playerName(state.currentIndex)}のターンです`);
+    setOnlineStatus(`${playerName(state.currentIndex)}のターンです`);
   }
 
   updateComboHints();
@@ -1601,7 +1604,10 @@ function sendOnlineAction(type) {
   })
     .then(() => {
       if (type === "play") {
+        playSfx("play");
         state.selectedIds = new Set();
+      } else if (type === "pass") {
+        playSfx("pass");
       }
       fetchOnlineState();
     })
