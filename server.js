@@ -2,6 +2,15 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const { URL } = require("url");
+const { getRoom, saveRoom, deleteRoom, touchRoom, withRoomLock } = require("./lib/roomStore");
+const { 
+  loadRuleCatalog,
+  getDefaultRuleConfig,
+  normalizeRuleConfig,
+  createRoom,
+  roomSummary
+} = require("./lib/game");
+const { readJson, sendJson } = require("./lib/http");
 
 const PORT = Number(process.env.PORT) || 3000;
 const PUBLIC_DIR = __dirname;
@@ -177,8 +186,6 @@ function getActiveCombos(rules) {
   }
   return combos;
 }
-
-const rooms = new Map();
 
 function sendJson(res, status, data) {
   res.writeHead(status, { "Content-Type": "application/json" });
@@ -417,88 +424,25 @@ function pickFirstPlayerId(room) {
   return room.players[randomIndex].playerId;
 }
 
-function createRoom(name, maxPlayers, turnTimeLimitSec, rules) {
-  let roomCode = randomCode();
-  while (rooms.has(roomCode)) {
-    roomCode = randomCode();
-  }
-  const ownerId = randomId("p");
-  const now = Date.now();
-  const room = {
-    roomCode,
-    ownerId,
-    createdAt: now,
-    phase: "lobby",
-    maxPlayers: Math.min(Math.max(maxPlayers, 2), 6),
-    turnTimeLimitSec: turnTimeLimitSec || null,
-    stateVersion: 1,
-    players: [
-      {
-        playerId: ownerId,
-        name,
-        joinedAt: now,
-        disconnected: false,
-        lastSeenAt: now,
-      },
-    ],
-    rules: normalizeRuleConfig(RULE_CATALOG, rules || DEFAULT_RULES),
-    game: null,
-    log: [{ at: now, text: `${name} がルームを作成` }],
-  };
-  rooms.set(roomCode, room);
-  return room;
-}
-
-function roomSummary(room, playerId) {
-  const now = Date.now();
-  const players = room.players.map((player) => {
-    const hand = room.game?.hands[player.playerId] || [];
-    return {
-      playerId: player.playerId,
-      name: player.name,
-      disconnected: player.disconnected,
-      lastSeenAt: player.lastSeenAt,
-      handCount: hand.length,
-    };
-  });
-
-  return {
-    roomCode: room.roomCode,
-    ownerId: room.ownerId,
-    phase: room.phase,
-    maxPlayers: room.maxPlayers,
-    turnTimeLimitSec: room.turnTimeLimitSec,
-    stateVersion: room.stateVersion,
-    rules: room.rules,
-    players,
-    game: room.game
-      ? {
-          field: room.game.field,
-          revolution: room.game.revolution,
-          currentTurnPlayerId: room.game.currentTurnPlayerId,
-          turnDeadlineAt: room.game.turnDeadlineAt,
-          gameOver: room.game.gameOver,
-          ranking: room.game.ranking,
-          fieldMeta: room.game.fieldMeta,
-        }
-      : null,
-    log: room.log.slice(-5),
-    serverTime: now,
-  };
-}
-
 function handleApi(req, res, url) {
   const parts = url.pathname.split("/").filter(Boolean);
   if (parts[0] !== "api") return false;
 
   if (req.method === "POST" && parts[1] === "rooms" && parts.length === 2) {
     readBody(req)
-      .then((body) => {
+      .then(async (body) => {
         const name = String(body.ownerName || body.name || "Player").slice(0, 12);
         const maxPlayers = Number(body.maxPlayers || 6);
         const turnTimeLimitSec = body.turnTimeLimitSec || null;
         const rules = body.rules || null;
-        const room = createRoom(name, maxPlayers, turnTimeLimitSec, rules);
+        
+        const catalog = loadRuleCatalog();
+        const defaults = getDefaultRuleConfig(catalog);
+        const normalizedRules = normalizeRuleConfig(catalog, rules || defaults);
+        
+        const room = createRoom(name, maxPlayers, turnTimeLimitSec, normalizedRules);
+        await saveRoom(room);
+        
         sendJson(res, 200, {
           ok: true,
           roomCode: room.roomCode,
