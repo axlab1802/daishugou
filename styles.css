@@ -679,7 +679,6 @@ body.is-game-active .combo-hint {
   .player-area {
     padding: 12px;
     position: relative;
-    padding-bottom: 72px;
   }
 
   .player-area .section-title {
@@ -703,11 +702,11 @@ body.is-game-active .combo-hint {
   }
 
   .action-bar {
-    position: absolute;
-    right: 10px;
-    bottom: 10px;
-    flex-direction: column;
-    gap: 8px;
+    position: static;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 12px;
     z-index: 2;
   }
 
