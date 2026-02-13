@@ -265,7 +265,7 @@ const elements = {
   localControls: document.getElementById("local-controls"),
   onlineControls: document.getElementById("online-controls"),
   onlineName: document.getElementById("online-name"),
-  startMultiplayer: document.getElementById("start-multiplayer"),
+  joinMultiplayer: document.getElementById("join-multiplayer"),
   leaveRoom: document.getElementById("leave-room"),
   onlineStatus: document.getElementById("online-status"),
   onlinePlayers: document.getElementById("online-players"),
@@ -1338,8 +1338,8 @@ async function apiRequest(path, method, body) {
   throw new Error("API_ERROR");
 }
 
-async function startMultiplayer() {
-  const name = elements.onlineName.value.trim() || "Player";
+async function joinMultiplayer() {
+  const name = elements.onlineName.value.trim();
   if (!name) {
     setOnlineStatus("名前を入力してください");
     return;
@@ -1347,7 +1347,7 @@ async function startMultiplayer() {
   
   try {
     saveNickname(name);
-    setOnlineStatus("マルチプレイを開始中...");
+    setOnlineStatus("参加中...");
     
     // グローバルマルチプレイルームに参加
     const data = await apiRequest("/api/multiplayer/join", "POST", { name });
@@ -1357,6 +1357,12 @@ async function startMultiplayer() {
     
     setOnlineStatus("マルチプレイ待機中...");
     updateRuleSettingsAvailability();
+    
+    // 参加後のUI状態を更新
+    elements.onlineName.disabled = true;
+    elements.joinMultiplayer.style.display = "none";
+    elements.leaveRoom.style.display = "inline-block";
+    
     startPolling();
   } catch (error) {
     setOnlineStatus(`エラー: ${error.message}`);
@@ -1405,6 +1411,36 @@ async function joinRoom() {
   } catch (error) {
     setOnlineStatus(`エラー: ${error.message}`);
   }
+}
+
+async function leaveRoom() {
+  if (!state.online.roomCode || !state.online.playerId) return;
+  try {
+    const endpoint = state.online.roomCode === "global"
+      ? `/api/multiplayer/leave`
+      : `/api/rooms/${state.online.roomCode}/leave`;
+    
+    await apiRequest(endpoint, "POST", {
+      playerId: state.online.playerId,
+    });
+  } catch (error) {
+    // ignore
+  }
+  stopPolling();
+  state.online.roomCode = null;
+  state.online.playerId = null;
+  state.online.ownerId = null;
+  resetOnlineState();
+  renderAll();
+  
+  // UI状態をリセット
+  elements.onlineName.disabled = false;
+  const hasName = elements.onlineName.value.trim().length > 0;
+  elements.joinMultiplayer.style.display = hasName ? "inline-block" : "none";
+  elements.startMultiplayer.style.display = hasName ? "none" : "inline-block";
+  elements.leaveRoom.style.display = "none";
+  
+  setOnlineStatus("退出しました");
 }
 
 function reorderPlayers(players, localId) {
@@ -1587,12 +1623,20 @@ async function init() {
   elements.startButton.addEventListener("click", startLocalGame);
   elements.modeLocal.addEventListener("click", () => setMode("local"));
   elements.modeOnline.addEventListener("click", () => setMode("online"));
-  elements.startMultiplayer.addEventListener("click", startMultiplayer);
+  elements.joinMultiplayer.addEventListener("click", joinMultiplayer);
   elements.leaveRoom.addEventListener("click", leaveRoom);
+
+  // 名前入力欄のイベントリスナー
+  elements.onlineName.addEventListener("input", (e) => {
+    const hasName = e.target.value.trim().length > 0;
+    elements.joinMultiplayer.style.display = hasName ? "inline-block" : "none";
+  });
 
   const storedName = loadNickname();
   if (storedName && elements.onlineName) {
     elements.onlineName.value = storedName;
+    // 名前が既に入っている場合は参加ボタンを表示
+    elements.joinMultiplayer.style.display = "inline-block";
   }
 
   setMode("online");
