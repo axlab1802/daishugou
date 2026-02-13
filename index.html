@@ -47,28 +47,12 @@
             名前
             <input id="online-name" type="text" maxlength="12" placeholder="名前を入力" />
           </label>
-          <label class="control-bar__label">
-            ルームコード
-            <input id="online-room" type="text" maxlength="6" placeholder="例: 483921" />
-          </label>
-          <label class="control-bar__label">
-            最大人数
-            <select id="online-max">
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6" selected>6</option>
-            </select>
-          </label>
         </div>
         <div class="control-bar__actions">
-          <button class="btn btn--primary" id="create-room">ルーム作成</button>
-          <button class="btn btn--ghost" id="join-room">参加</button>
+          <button class="btn btn--primary" id="start-multiplayer">マルチプレイ開始</button>
           <button class="btn btn--ghost" id="leave-room">退出</button>
-          <button class="btn btn--primary" id="online-start">開始</button>
         </div>
-        <div class="lobby-status" id="online-status">ロビー待機中</div>
+        <div class="lobby-status" id="online-status">準備中...</div>
         <div class="lobby-players" id="online-players"></div>
         <div class="rule-settings">
           <p class="rule-settings__title">追加ルール</p>

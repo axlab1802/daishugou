@@ -265,12 +265,8 @@ const elements = {
   localControls: document.getElementById("local-controls"),
   onlineControls: document.getElementById("online-controls"),
   onlineName: document.getElementById("online-name"),
-  onlineRoom: document.getElementById("online-room"),
-  onlineMax: document.getElementById("online-max"),
-  createRoom: document.getElementById("create-room"),
-  joinRoom: document.getElementById("join-room"),
+  startMultiplayer: document.getElementById("start-multiplayer"),
   leaveRoom: document.getElementById("leave-room"),
-  onlineStart: document.getElementById("online-start"),
   onlineStatus: document.getElementById("online-status"),
   onlinePlayers: document.getElementById("online-players"),
   ruleSettingsLocal: document.getElementById("rule-settings-local"),
@@ -606,7 +602,12 @@ function determineFirstTurn() {
     state.currentIndex = Math.floor(Math.random() * state.players.length);
   }
 
-  setMessage(`${playerName(state.currentIndex)}のターンです`);
+  const currentPlayer = state.players[state.currentIndex];
+  if (currentPlayer && currentPlayer.isHuman) {
+    setMessage("あなたのターンです");
+  } else {
+    setMessage(`${playerName(state.currentIndex)}のターンです`);
+  }
 }
 
 function countRanks(cards) {
@@ -1337,6 +1338,31 @@ async function apiRequest(path, method, body) {
   throw new Error("API_ERROR");
 }
 
+async function startMultiplayer() {
+  const name = elements.onlineName.value.trim() || "Player";
+  if (!name) {
+    setOnlineStatus("名前を入力してください");
+    return;
+  }
+  
+  try {
+    saveNickname(name);
+    setOnlineStatus("マルチプレイを開始中...");
+    
+    // グローバルマルチプレイルームに参加
+    const data = await apiRequest("/api/multiplayer/join", "POST", { name });
+    state.online.roomCode = "global";
+    state.online.playerId = data.playerId;
+    state.online.ownerId = data.ownerId;
+    
+    setOnlineStatus("マルチプレイ待機中...");
+    updateRuleSettingsAvailability();
+    startPolling();
+  } catch (error) {
+    setOnlineStatus(`エラー: ${error.message}`);
+  }
+}
+
 async function createRoom() {
   const name = elements.onlineName.value.trim() || "Player";
   const maxPlayers = Number(elements.onlineMax.value);
@@ -1376,37 +1402,6 @@ async function joinRoom() {
     setOnlineStatus(`参加完了: ${roomCode}`);
     updateRuleSettingsAvailability();
     startPolling();
-  } catch (error) {
-    setOnlineStatus(`エラー: ${error.message}`);
-  }
-}
-
-async function leaveRoom() {
-  if (!state.online.roomCode || !state.online.playerId) return;
-  try {
-    await apiRequest(`/api/rooms/${state.online.roomCode}/leave`, "POST", {
-      playerId: state.online.playerId,
-    });
-  } catch (error) {
-    // ignore
-  }
-  stopPolling();
-  state.online.roomCode = null;
-  state.online.playerId = null;
-  state.online.ownerId = null;
-  resetOnlineState();
-  renderAll();
-  setOnlineStatus("退出しました");
-}
-
-async function startOnlineGame() {
-  if (!state.online.roomCode || !state.online.playerId) return;
-  try {
-    await apiRequest(`/api/rooms/${state.online.roomCode}/start`, "POST", {
-      ownerId: state.online.ownerId,
-    });
-  } catch (error) {
-    setOnlineStatus(`エラー: ${error.message}`);
   }
 }
 
@@ -1446,7 +1441,6 @@ function applyOnlineState(data) {
     state.currentIndex = 0;
     setMessage("ロビー待機中");
     renderAll();
-    elements.onlineStart.disabled = room.ownerId !== state.online.playerId;
     return;
   }
 
@@ -1486,20 +1480,30 @@ function applyOnlineState(data) {
 
   updateComboHints();
   renderAll();
-  elements.onlineStart.disabled = true;
 }
 
 async function fetchOnlineState() {
   if (!state.online.roomCode || !state.online.playerId) return;
   try {
-    const data = await apiRequest(
-      `/api/rooms/${state.online.roomCode}/state?playerId=${state.online.playerId}`,
-      "GET"
-    );
+    const endpoint = state.online.roomCode === "global" 
+      ? `/api/multiplayer/state?playerId=${state.online.playerId}`
+      : `/api/rooms/${state.online.roomCode}/state?playerId=${state.online.playerId}`;
+    
+    const data = await apiRequest(endpoint);
     applyOnlineState(data);
     return true;
   } catch (error) {
-    setOnlineStatus(`エラー: ${error.message}`);
+    if (error.message === "PLAYER_NOT_FOUND" || error.message === "ROOM_NOT_FOUND") {
+      stopPolling();
+      state.online.roomCode = null;
+      state.online.playerId = null;
+      state.online.ownerId = null;
+      resetOnlineState();
+      renderAll();
+      setOnlineStatus("接続が切断されました");
+    } else {
+      setOnlineStatus(`エラー: ${error.message}`);
+    }
     return false;
   }
 }
@@ -1581,10 +1585,8 @@ async function init() {
   elements.startButton.addEventListener("click", startLocalGame);
   elements.modeLocal.addEventListener("click", () => setMode("local"));
   elements.modeOnline.addEventListener("click", () => setMode("online"));
-  elements.createRoom.addEventListener("click", createRoom);
-  elements.joinRoom.addEventListener("click", joinRoom);
+  elements.startMultiplayer.addEventListener("click", startMultiplayer);
   elements.leaveRoom.addEventListener("click", leaveRoom);
-  elements.onlineStart.addEventListener("click", startOnlineGame);
 
   const storedName = loadNickname();
   if (storedName && elements.onlineName) {
