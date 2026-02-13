@@ -264,6 +264,9 @@ const elements = {
   rulesOverlay: document.getElementById("rules-overlay"),
   rulesClose: document.getElementById("rules-close"),
   rulesList: document.getElementById("rules-list"),
+  rankingOverlay: document.getElementById("ranking-overlay"),
+  rankingList: document.getElementById("ranking-list"),
+  rankingClose: document.getElementById("ranking-close"),
   seats: Array.from(document.querySelectorAll(".seat")),
   modeLocal: document.getElementById("mode-local"),
   modeOnline: document.getElementById("mode-online"),
@@ -370,6 +373,52 @@ function openRulesPanel() {
 
 function closeRulesPanel() {
   elements.rulesOverlay.style.display = "none";
+}
+
+function showRanking(ranking, players, myPlayerId) {
+  const list = elements.rankingList;
+  list.innerHTML = "";
+  const RANK_LABELS = ["大酒豪", "酒豪", "", "酔い潰れ"];
+  const totalPlayers = players.length;
+
+  ranking.forEach((playerId, index) => {
+    const player = players.find((p) => p.id === playerId || p.playerId === playerId);
+    const name = player ? (player.name || "???") : "???";
+    const isYou = playerId === myPlayerId;
+    const rank = index + 1;
+
+    const item = document.createElement("div");
+    item.className = "ranking-panel__item" + (isYou ? " ranking-panel__item--you" : "");
+
+    const rankEl = document.createElement("div");
+    rankEl.className = `ranking-panel__rank ranking-panel__rank--${rank}`;
+    rankEl.textContent = `${rank}位`;
+
+    const nameEl = document.createElement("div");
+    nameEl.className = "ranking-panel__name";
+    nameEl.textContent = name + (isYou ? " (あなた)" : "");
+
+    const labelEl = document.createElement("div");
+    labelEl.className = "ranking-panel__label";
+    if (rank === 1) {
+      labelEl.textContent = RANK_LABELS[0];
+    } else if (rank === totalPlayers) {
+      labelEl.textContent = RANK_LABELS[3];
+    } else if (rank === 2 && totalPlayers >= 3) {
+      labelEl.textContent = RANK_LABELS[1];
+    }
+
+    item.appendChild(rankEl);
+    item.appendChild(nameEl);
+    item.appendChild(labelEl);
+    list.appendChild(item);
+  });
+
+  elements.rankingOverlay.style.display = "flex";
+}
+
+function closeRanking() {
+  elements.rankingOverlay.style.display = "none";
 }
 
 function displayRank(rank) {
@@ -1356,6 +1405,7 @@ function resetOnlineState() {
   state.online.lastStateVersion = null;
   state.rules.config = { ...state.rules.localConfig };
   setMessage("ロビー待機中");
+  closeRanking();
   renderRuleSettings();
   updateRuleSettingsAvailability();
   setGameActive(false);
@@ -1577,8 +1627,34 @@ function applyOnlineState(data) {
 
   if (state.gameOver) {
     setGameActive(false);
-    setMessage("ゲーム終了");
+    stopPolling();
+
+    // ランキングを構築（最後の敗者をランキングに追加）
+    const ranking = [...(room.game?.ranking || [])];
+    const allPlayerIds = room.players.map((p) => p.playerId);
+    allPlayerIds.forEach((pid) => {
+      if (!ranking.includes(pid)) ranking.push(pid);
+    });
+
+    // 自分の順位を確認して効果音を再生
+    const myRank = ranking.indexOf(state.online.playerId) + 1;
+    const totalPlayers = room.players.length;
+    if (myRank === 1) {
+      setMessage("あなたの勝ち！（大酒豪）");
+      playSfx("win");
+    } else if (myRank === totalPlayers) {
+      setMessage("あなたの負け…（酔い潰れ）");
+      playSfx("lose");
+    } else {
+      setMessage(`${myRank}位でフィニッシュ！`);
+      playSfx("win");
+    }
     setOnlineStatus("ゲーム終了");
+
+    // 少し遅延して順位パネルを表示
+    setTimeout(() => {
+      showRanking(ranking, room.players, state.online.playerId);
+    }, 1500);
   } else if (state.currentIndex === 0) {
     setGameActive(true);
     setTurnMessage();
@@ -1700,6 +1776,10 @@ async function init() {
   elements.rulesClose.addEventListener("click", closeRulesPanel);
   elements.rulesOverlay.addEventListener("click", (e) => {
     if (e.target === elements.rulesOverlay) closeRulesPanel();
+  });
+  elements.rankingClose.addEventListener("click", () => {
+    closeRanking();
+    resetRoom();
   });
   elements.startButton.addEventListener("click", startLocalGame);
   elements.modeLocal.addEventListener("click", () => setMode("local"));
