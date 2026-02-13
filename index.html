@@ -116,12 +116,24 @@
         <section class="action-bar">
           <button class="btn btn--primary" id="play-button">出す！</button>
           <button class="btn btn--ghost" id="pass-button">パス</button>
+          <button class="btn btn--ghost btn--small" id="rules-button">ルール</button>
         </section>
       </section>
     </div>
 
+    <div class="rules-overlay" id="rules-overlay" style="display: none;">
+      <div class="rules-panel">
+        <div class="rules-panel__header">
+          <h2 class="rules-panel__title">有効なローカルルール</h2>
+          <button class="btn btn--ghost btn--small" id="rules-close">&times;</button>
+        </div>
+        <div class="rules-panel__list" id="rules-list"></div>
+      </div>
+    </div>
+
     <div class="effect-layer" id="effect-layer" aria-hidden="true">
       <div class="effect-text" id="effect-text"></div>
+      <div class="effect-sub" id="effect-sub"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>

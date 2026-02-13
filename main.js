@@ -259,6 +259,11 @@ const elements = {
   cpuSelect: document.getElementById("cpu-count"),
   effectLayer: document.getElementById("effect-layer"),
   effectText: document.getElementById("effect-text"),
+  effectSub: document.getElementById("effect-sub"),
+  rulesButton: document.getElementById("rules-button"),
+  rulesOverlay: document.getElementById("rules-overlay"),
+  rulesClose: document.getElementById("rules-close"),
+  rulesList: document.getElementById("rules-list"),
   seats: Array.from(document.querySelectorAll(".seat")),
   modeLocal: document.getElementById("mode-local"),
   modeOnline: document.getElementById("mode-online"),
@@ -326,6 +331,45 @@ function setTurnMessage() {
   } else {
     setMessage(`${playerName(state.currentIndex)}のターンです`);
   }
+}
+
+function getRuleDescription(ruleId) {
+  if (!state.rules.catalog) return "";
+  const rule = state.rules.catalog.find((r) => r.id === ruleId);
+  return rule ? rule.description : "";
+}
+
+function openRulesPanel() {
+  const list = elements.rulesList;
+  list.innerHTML = "";
+  const catalog = state.rules.catalog || [];
+  const config = state.rules.config || {};
+  const activeRules = catalog.filter((r) => r.implemented && config[r.id]);
+  if (activeRules.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "rules-panel__empty";
+    empty.textContent = "有効なローカルルールはありません";
+    list.appendChild(empty);
+  } else {
+    activeRules.forEach((rule) => {
+      const item = document.createElement("div");
+      item.className = "rules-panel__item";
+      const name = document.createElement("div");
+      name.className = "rules-panel__item-name";
+      name.textContent = rule.name;
+      const desc = document.createElement("div");
+      desc.className = "rules-panel__item-desc";
+      desc.textContent = rule.description;
+      item.appendChild(name);
+      item.appendChild(desc);
+      list.appendChild(item);
+    });
+  }
+  elements.rulesOverlay.style.display = "flex";
+}
+
+function closeRulesPanel() {
+  elements.rulesOverlay.style.display = "none";
 }
 
 function displayRank(rank) {
@@ -826,19 +870,29 @@ function animateMessage() {
   );
 }
 
-function showEffect(text) {
+function showEffect(text, sub) {
   if (!window.gsap) return;
   elements.effectText.textContent = text;
-  gsap.killTweensOf([elements.effectLayer, elements.effectText]);
+  elements.effectSub.textContent = sub || "";
+  gsap.killTweensOf([elements.effectLayer, elements.effectText, elements.effectSub]);
   gsap.set(elements.effectLayer, { opacity: 1 });
+  gsap.set(elements.effectSub, { opacity: 0 });
   const tl = gsap.timeline();
   tl.fromTo(
     elements.effectText,
     { scale: 0.6, opacity: 0, y: 30 },
     { scale: 1, opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.8)" }
-  )
-    .to(elements.effectText, { scale: 1.1, duration: 0.25, ease: "power1.inOut" })
-    .to(elements.effectLayer, { opacity: 0, duration: 0.6, delay: 0.5 });
+  );
+  if (sub) {
+    tl.fromTo(
+      elements.effectSub,
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: 0.3 },
+      "-=0.1"
+    );
+  }
+  tl.to(elements.effectText, { scale: 1.1, duration: 0.25, ease: "power1.inOut" })
+    .to(elements.effectLayer, { opacity: 0, duration: 0.6, delay: 0.8 });
 }
 
 function renderSeats() {
@@ -1020,7 +1074,8 @@ function applyPlay(playerIndex, cards, combo) {
 
   if (combo) {
     playSfx("combo");
-    showEffect(`${combo.name}！`);
+    const comboDesc = combo.ruleId ? getRuleDescription(combo.ruleId) : "";
+    showEffect(`${combo.name}！`, comboDesc);
     setTimeout(() => showEffect(combo.effect), 400);
   }
 
@@ -1038,10 +1093,10 @@ function applyPlay(playerIndex, cards, combo) {
   const ochokoResetTriggered = isOchokoResetPlay(cards);
   const kanpaiBonusTriggered = isKanpaiBonusPlay(cards, previousField);
   if (ochokoResetTriggered) {
-    showEffect("おちょこリセット！");
+    showEffect("おちょこリセット！", getRuleDescription("ochokoReset"));
     playSfx("field_clear");
   } else if (kanpaiBonusTriggered) {
-    showEffect("乾杯ボーナス！");
+    showEffect("乾杯ボーナス！", getRuleDescription("kanpaiBonus"));
     playSfx("field_clear");
   }
 
@@ -1641,6 +1696,11 @@ async function init() {
 
   elements.playButton.addEventListener("click", playSelected);
   elements.passButton.addEventListener("click", passTurn);
+  elements.rulesButton.addEventListener("click", openRulesPanel);
+  elements.rulesClose.addEventListener("click", closeRulesPanel);
+  elements.rulesOverlay.addEventListener("click", (e) => {
+    if (e.target === elements.rulesOverlay) closeRulesPanel();
+  });
   elements.startButton.addEventListener("click", startLocalGame);
   elements.modeLocal.addEventListener("click", () => setMode("local"));
   elements.modeOnline.addEventListener("click", () => setMode("online"));

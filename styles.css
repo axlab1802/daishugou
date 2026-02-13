@@ -725,3 +725,89 @@ body.is-game-active .combo-hint {
     font-size: 12px;
   }
 }
+
+/* Rules overlay */
+.rules-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.rules-panel {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 400px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.rules-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.rules-panel__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c1810;
+  margin: 0;
+}
+
+.rules-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rules-panel__item {
+  background: rgba(92, 60, 35, 0.08);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.rules-panel__item-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: #5c3c23;
+  margin-bottom: 4px;
+}
+
+.rules-panel__item-desc {
+  font-size: 13px;
+  color: #4a3a2e;
+  line-height: 1.5;
+}
+
+.rules-panel__empty {
+  color: #999;
+  font-size: 14px;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.btn--small {
+  padding: 6px 10px;
+  font-size: 13px;
+  min-width: auto;
+}
+
+/* Effect sub text */
+.effect-sub {
+  font-size: 16px;
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  margin-top: 8px;
+  opacity: 0;
+}
