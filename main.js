@@ -1270,7 +1270,6 @@ function setMode(mode) {
 
   if (mode === "local") {
     stopPolling();
-    startLocalGame();
     return;
   }
 
@@ -1592,7 +1591,7 @@ async function init() {
     elements.onlineName.value = storedName;
   }
 
-  setMode("local");
+  setMode("online");
 }
 
 init();
