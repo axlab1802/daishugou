@@ -579,8 +579,10 @@ body.is-game-active .combo-hint {
 .effect-layer {
   position: fixed;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
   opacity: 0;
   z-index: 10;
@@ -885,9 +887,15 @@ body.is-game-active .combo-hint {
 
 /* Effect sub text */
 .effect-sub {
-  font-size: 16px;
+  font-size: clamp(14px, 3vw, 18px);
   color: #fff;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
-  margin-top: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 8px 18px;
+  border-radius: 10px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  margin-top: 12px;
   opacity: 0;
+  max-width: 90vw;
+  text-align: center;
+  line-height: 1.5;
 }

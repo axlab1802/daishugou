@@ -1628,6 +1628,32 @@ function applyOnlineState(data) {
   );
   state.fieldMeta = room.game?.fieldMeta || null;
 
+  // 他プレイヤーのアクションで発動したトリガーを表示（自分のアクション分はスキップ）
+  const triggers = room.game?.lastTriggers || [];
+  const alreadyHandled = state.online.lastHandledTriggerVersion === room.stateVersion;
+  if (triggers.length > 0 && !alreadyHandled) {
+    let delay = 0;
+    triggers.forEach((trigger) => {
+      setTimeout(() => {
+        if (trigger.type === "combo") {
+          playSfx("combo");
+          const desc = trigger.ruleId ? getRuleDescription(trigger.ruleId) : "";
+          showEffect(`${trigger.name}！`, desc);
+        } else if (trigger.type === "revolution") {
+          playSfx("revolution");
+          showEffect(trigger.name);
+        } else if (trigger.type === "rule") {
+          playSfx("field_clear");
+          const desc = getRuleDescription(trigger.ruleId);
+          showEffect(trigger.name, desc);
+        } else if (trigger.type === "finish") {
+          showEffect(trigger.name);
+        }
+      }, delay);
+      delay += 800;
+    });
+  }
+
   if (state.gameOver) {
     setGameActive(false);
     stopPolling();
@@ -1745,13 +1771,39 @@ function sendOnlineAction(type) {
     type,
     cardIds,
   })
-    .then(() => {
+    .then((data) => {
       if (type === "play") {
         playSfx("play");
         state.selectedIds = new Set();
       } else if (type === "pass") {
         playSfx("pass");
       }
+
+      // サーバーから返されたトリガーを表示（自分のアクション分）
+      state.online.lastHandledTriggerVersion = data.stateVersion;
+      if (data.triggers && data.triggers.length > 0) {
+        let delay = 0;
+        data.triggers.forEach((trigger) => {
+          setTimeout(() => {
+            if (trigger.type === "combo") {
+              playSfx("combo");
+              const desc = trigger.ruleId ? getRuleDescription(trigger.ruleId) : "";
+              showEffect(`${trigger.name}！`, desc);
+            } else if (trigger.type === "revolution") {
+              playSfx("revolution");
+              showEffect(trigger.name);
+            } else if (trigger.type === "rule") {
+              playSfx("field_clear");
+              const desc = getRuleDescription(trigger.ruleId);
+              showEffect(trigger.name, desc);
+            } else if (trigger.type === "finish") {
+              showEffect(trigger.name);
+            }
+          }, delay);
+          delay += 800;
+        });
+      }
+
       fetchOnlineState();
     })
     .catch((error) => {

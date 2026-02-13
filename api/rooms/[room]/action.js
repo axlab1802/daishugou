@@ -108,8 +108,15 @@ module.exports = async function handler(req, res) {
       room.game.lastPlayedId = playerId;
       room.game.passCount = 0;
 
+      const triggers = [];
+
+      if (validation.combo) {
+        triggers.push({ type: "combo", name: validation.combo.name, effect: validation.combo.effect, ruleId: validation.combo.ruleId || null });
+      }
+
       if (checkRevolution(cards)) {
         room.game.revolution = !room.game.revolution;
+        triggers.push({ type: "revolution", name: room.game.revolution ? "🔥革命！" : "革命返し！" });
       }
 
       const tequilaCounterTriggered = isTequilaCounterPlay(
@@ -119,6 +126,7 @@ module.exports = async function handler(req, res) {
       );
       if (tequilaCounterTriggered && previousPlayerId) {
         transferRandomCard(room, playerId, previousPlayerId);
+        triggers.push({ type: "rule", ruleId: "tequilaCounter", name: "テキーラ返し！" });
       }
 
       const ochokoResetTriggered = isOchokoResetPlay(cards, room.rules);
@@ -127,10 +135,17 @@ module.exports = async function handler(req, res) {
         previousField,
         room.rules
       );
+      if (ochokoResetTriggered) {
+        triggers.push({ type: "rule", ruleId: "ochokoReset", name: "おちょこリセット！" });
+      } else if (kanpaiBonusTriggered) {
+        triggers.push({ type: "rule", ruleId: "kanpaiBonus", name: "乾杯ボーナス！" });
+      }
 
       const updatedHand = room.game.hands[playerId] || [];
       if (updatedHand.length === 0 && !room.game.ranking.includes(playerId)) {
         room.game.ranking.push(playerId);
+        const rp = room.players.find((p) => p.playerId === playerId);
+        triggers.push({ type: "finish", name: `${rp ? rp.name : ""} 上がり！` });
       }
 
       if (activePlayerCount(room) <= 1) {
@@ -138,8 +153,9 @@ module.exports = async function handler(req, res) {
         room.phase = "finished";
         room.log.push({ at: Date.now(), text: "ゲーム終了" });
         room.stateVersion += 1;
+        room.game.lastTriggers = triggers;
         await saveRoom(room);
-        return { status: 200, data: { ok: true, stateVersion: room.stateVersion } };
+        return { status: 200, data: { ok: true, stateVersion: room.stateVersion, triggers } };
       }
 
       if (updatedHand.length > 0 && (ochokoResetTriggered || kanpaiBonusTriggered)) {
@@ -153,8 +169,9 @@ module.exports = async function handler(req, res) {
       }
 
       room.stateVersion += 1;
+      room.game.lastTriggers = triggers;
       await saveRoom(room);
-      return { status: 200, data: { ok: true, stateVersion: room.stateVersion } };
+      return { status: 200, data: { ok: true, stateVersion: room.stateVersion, triggers } };
     });
 
     if (result && result.error === "ROOM_BUSY") {
