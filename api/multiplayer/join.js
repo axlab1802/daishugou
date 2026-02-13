@@ -45,9 +45,11 @@ module.exports = async function handler(req, res) {
       }
       
       // 既に同じ名前のプレイヤーがいるかチェック
-      const existingPlayer = room.players.find(p => p.name === name);
-      if (existingPlayer) {
-        return { status: 409, data: { ok: false, error: "NAME_ALREADY_EXISTS" } };
+      let finalName = name;
+      let nameSuffix = 1;
+      while (room.players.find(p => p.name === finalName)) {
+        finalName = `${name}${nameSuffix}`;
+        nameSuffix++;
       }
       
       // プレイヤーを追加
@@ -55,13 +57,13 @@ module.exports = async function handler(req, res) {
       const now = Date.now();
       room.players.push({
         playerId,
-        name,
+        name: finalName,
         joinedAt: now,
         disconnected: false,
         lastSeenAt: now,
       });
       room.stateVersion += 1;
-      room.log.push({ at: now, text: `${name} が参加` });
+      room.log.push({ at: now, text: `${finalName} が参加` });
       
       // 2人以上集まったら自動でゲーム開始
       if (room.players.length >= 2 && room.phase === "lobby") {
@@ -77,6 +79,7 @@ module.exports = async function handler(req, res) {
           ok: true, 
           playerId,
           ownerId: room.ownerId,
+          playerName: finalName,
           room: roomSummary(room)
         } 
       };

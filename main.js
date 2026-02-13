@@ -1355,6 +1355,12 @@ async function joinMultiplayer() {
     state.online.playerId = data.playerId;
     state.online.ownerId = data.ownerId;
     
+    // 名前が変更された場合に更新
+    if (data.playerName && data.playerName !== name) {
+      elements.onlineName.value = data.playerName;
+      saveNickname(data.playerName);
+    }
+    
     setOnlineStatus("マルチプレイ待機中...");
     updateRuleSettingsAvailability();
     
