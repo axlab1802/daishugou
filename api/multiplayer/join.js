@@ -32,6 +32,20 @@ module.exports = async function handler(req, res) {
         
         room = createRoom(name, MAX_PLAYERS, null, rules);
         room.roomCode = GLOBAL_ROOM_CODE;
+        
+        await saveRoom(room);
+        
+        // createRoom が既にオーナーを追加済みなのでそのまま返す
+        return { 
+          status: 200, 
+          data: { 
+            ok: true, 
+            playerId: room.ownerId,
+            ownerId: room.ownerId,
+            playerName: name,
+            room: roomSummary(room)
+          } 
+        };
       }
       
       // 満員かチェック
