@@ -55,7 +55,6 @@ body.is-game-active .info-bar,
 body.is-game-active .mode-bar,
 body.is-game-active #local-controls,
 body.is-game-active #online-controls,
-body.is-game-active .message-area,
 body.is-game-active .combo-hint {
   display: none;
 }
