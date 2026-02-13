@@ -608,13 +608,11 @@ function renderRuleSettings() {
 }
 
 function updateRuleSettingsAvailability() {
-  const editable =
-    state.mode === "local" || (state.mode === "online" && !state.online.roomCode);
+  const inGame = state.online.phase === "playing" || state.online.phase === "finished";
+  const editable = !inGame;
   const inputs = document.querySelectorAll(".rule-option input[data-rule-id]");
   inputs.forEach((input) => {
-    const rule = state.rules.catalog.find((item) => item.id === input.dataset.ruleId);
-    const isImplemented = rule ? rule.implemented : false;
-    input.disabled = !editable || !isImplemented;
+    input.disabled = !editable;
   });
 }
 
