@@ -1298,6 +1298,7 @@ function resetOnlineState() {
   state.comboHintCardIds = new Set();
   state.comboHintText = "";
   state.lastAction = null;
+  state.online.lastStateVersion = null;
   state.rules.config = { ...state.rules.localConfig };
   setMessage("ロビー待機中");
   renderRuleSettings();
@@ -1451,6 +1452,10 @@ function reorderPlayers(players, localId) {
 function applyOnlineState(data) {
   const room = data.room;
   if (!room) return;
+
+  // stateVersion が変わっていなければ再描画をスキップ
+  if (state.online.lastStateVersion === room.stateVersion) return;
+  state.online.lastStateVersion = room.stateVersion;
 
   state.online.phase = room.phase;
   state.online.ownerId = room.ownerId;
