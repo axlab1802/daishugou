@@ -319,6 +319,15 @@ function initSfx(catalog) {
   });
 }
 
+function setTurnMessage() {
+  const currentPlayer = state.players[state.currentIndex];
+  if (currentPlayer && currentPlayer.isHuman) {
+    setMessage("あなたの番です");
+  } else {
+    setMessage(`${playerName(state.currentIndex)}のターンです`);
+  }
+}
+
 function displayRank(rank) {
   if (rank === JOKER_RANK) return "JOKER";
   if (rank === 11) return "J";
@@ -605,12 +614,7 @@ function determineFirstTurn() {
     state.currentIndex = Math.floor(Math.random() * state.players.length);
   }
 
-  const currentPlayer = state.players[state.currentIndex];
-  if (currentPlayer && currentPlayer.isHuman) {
-    setMessage("あなたのターンです");
-  } else {
-    setMessage(`${playerName(state.currentIndex)}のターンです`);
-  }
+  setTurnMessage();
 }
 
 function countRanks(cards) {
@@ -1069,7 +1073,7 @@ function applyPlay(playerIndex, cards, combo) {
     state.fieldMeta = null;
     state.passCount = 0;
     state.currentIndex = playerIndex;
-    setMessage(`${playerName(state.currentIndex)}のターンです`);
+    setTurnMessage();
     updateComboHints();
     renderAll();
     runCpuTurns();
@@ -1077,7 +1081,7 @@ function applyPlay(playerIndex, cards, combo) {
   }
 
   state.currentIndex = nextActiveIndex(playerIndex);
-  setMessage(`${playerName(state.currentIndex)}のターンです`);
+  setTurnMessage();
   updateComboHints();
   renderAll();
   runCpuTurns();
@@ -1108,7 +1112,7 @@ function handlePass(playerIndex) {
         ? state.lastPlayedIndex
         : nextActiveIndex(playerIndex);
     state.currentIndex = nextIndex;
-    setMessage(`${playerName(state.currentIndex)}のターンです`);
+    setTurnMessage();
     updateComboHints();
     renderAll();
     runCpuTurns();
@@ -1116,7 +1120,7 @@ function handlePass(playerIndex) {
   }
 
   state.currentIndex = nextActiveIndex(playerIndex);
-  setMessage(`${playerName(state.currentIndex)}のターンです`);
+  setTurnMessage();
   updateComboHints();
   renderAll();
   runCpuTurns();
@@ -1517,11 +1521,11 @@ function applyOnlineState(data) {
     setOnlineStatus("ゲーム終了");
   } else if (state.currentIndex === 0) {
     setGameActive(true);
-    setMessage("あなたの番です");
+    setTurnMessage();
     setOnlineStatus("あなたの番です");
   } else if (state.currentIndex >= 0) {
     setGameActive(true);
-    setMessage(`${playerName(state.currentIndex)}のターンです`);
+    setTurnMessage();
     setOnlineStatus(`${playerName(state.currentIndex)}のターンです`);
   }
 
