@@ -351,7 +351,7 @@ function openRulesPanel() {
   if (activeRules.length === 0) {
     const empty = document.createElement("div");
     empty.className = "rules-panel__empty";
-    empty.textContent = "有効なローカルルールはありません";
+    empty.textContent = "有効なソロルールはありません";
     list.appendChild(empty);
   } else {
     activeRules.forEach((rule) => {
@@ -1457,31 +1457,31 @@ async function joinMultiplayer() {
     setOnlineStatus("名前を入力してください");
     return;
   }
-  
+
   try {
     saveNickname(name);
     setOnlineStatus("参加中...");
-    
+
     // グローバルマルチプレイルームに参加
     const data = await apiRequest("/api/multiplayer/join", "POST", { name });
     state.online.roomCode = "global";
     state.online.playerId = data.playerId;
     state.online.ownerId = data.ownerId;
-    
+
     // 名前が変更された場合に更新
     if (data.playerName && data.playerName !== name) {
       elements.onlineName.value = data.playerName;
       saveNickname(data.playerName);
     }
-    
+
     setOnlineStatus("マルチプレイ待機中...");
     updateRuleSettingsAvailability();
-    
+
     // 参加後のUI状態を更新
     elements.onlineName.disabled = true;
     elements.joinMultiplayer.style.display = "none";
     elements.leaveRoom.style.display = "inline-block";
-    
+
     startPolling();
   } catch (error) {
     setOnlineStatus(`エラー: ${error.message}`);
@@ -1494,7 +1494,7 @@ async function startOnlineGame() {
     const endpoint = state.online.roomCode === "global"
       ? "/api/multiplayer/start"
       : `/api/rooms/${state.online.roomCode}/start`;
-    
+
     await apiRequest(endpoint, "POST", {
       playerId: state.online.playerId,
     });
@@ -1509,7 +1509,7 @@ async function leaveRoom() {
     const endpoint = state.online.roomCode === "global"
       ? `/api/multiplayer/leave`
       : `/api/rooms/${state.online.roomCode}/leave`;
-    
+
     await apiRequest(endpoint, "POST", {
       playerId: state.online.playerId,
     });
@@ -1537,7 +1537,7 @@ function resetAfterLeave() {
   resetOnlineState();
   elements.onlinePlayers.innerHTML = "";
   renderAll();
-  
+
   // UI状態をリセット
   elements.onlineName.disabled = false;
   const hasName = elements.onlineName.value.trim().length > 0;
@@ -1545,7 +1545,7 @@ function resetAfterLeave() {
   elements.startGame.style.display = "none";
   elements.resetRoom.style.display = "none";
   elements.leaveRoom.style.display = "none";
-  
+
   setOnlineStatus("退出しました");
 }
 
@@ -1589,7 +1589,7 @@ function applyOnlineState(data) {
     state.currentIndex = 0;
     setMessage("ロビー待機中");
     renderAll();
-    
+
     // ゲーム開始ボタンの表示制御
     if (room.players.length >= 2) {
       elements.startGame.style.display = "inline-block";
@@ -1599,7 +1599,7 @@ function applyOnlineState(data) {
       setOnlineStatus(`${room.players.length}人待機中...`);
     }
     elements.resetRoom.style.display = "inline-block";
-    
+
     return;
   }
 
@@ -1699,10 +1699,10 @@ function applyOnlineState(data) {
 async function fetchOnlineState() {
   if (!state.online.roomCode || !state.online.playerId) return;
   try {
-    const endpoint = state.online.roomCode === "global" 
+    const endpoint = state.online.roomCode === "global"
       ? `/api/multiplayer/state?playerId=${state.online.playerId}`
       : `/api/rooms/${state.online.roomCode}/state?playerId=${state.online.playerId}`;
-    
+
     const data = await apiRequest(endpoint);
     applyOnlineState(data);
     return true;
@@ -1855,7 +1855,7 @@ async function init() {
     elements.joinMultiplayer.style.display = "inline-block";
   }
 
-  setMode("online");
+  setMode("local");
 }
 
 init();

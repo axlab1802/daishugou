@@ -1,151 +1,154 @@
 <!doctype html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>大酒豪 DAISHUGO</title>
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <div class="app">
-      <header class="app__header">
-        <p class="app__subtitle">DAISHUGO</p>
-        <h1 class="app__title">大酒豪 DAISHUGO</h1>
-      </header>
 
-      <section class="info-bar">
-        <div class="info-bar__item">対戦人数: <span id="player-count">2</span>人</div>
-        <div class="info-bar__item info-bar__revolution" id="revolution-indicator">通常進行</div>
-      </section>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>大酒豪 DAISHUGO</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
 
-      <section class="mode-bar">
-        <button class="btn btn--ghost is-active" id="mode-local">ローカル</button>
-        <button class="btn btn--ghost" id="mode-online">オンライン</button>
-      </section>
+<body>
+  <div class="app">
+    <header class="app__header">
+      <p class="app__subtitle">DAISHUGO</p>
+      <h1 class="app__title">大酒豪 DAISHUGO</h1>
+    </header>
 
-      <section class="control-bar" id="local-controls">
-        <label class="control-bar__label">
-          CPU人数
-          <select id="cpu-count">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-          </select>
-        </label>
-        <button class="btn btn--primary" id="start-button">ゲーム開始</button>
-        <div class="rule-settings">
-          <p class="rule-settings__title">追加ルール</p>
-          <div class="rule-settings__list" id="rule-settings-local"></div>
-        </div>
-      </section>
+    <section class="info-bar">
+      <div class="info-bar__item">対戦人数: <span id="player-count">2</span>人</div>
+      <div class="info-bar__item info-bar__revolution" id="revolution-indicator">通常進行</div>
+    </section>
 
-      <section class="control-bar control-bar--online is-hidden" id="online-controls">
-        <div class="control-bar__group">
-          <label class="control-bar__label">
-            名前
-            <input id="online-name" type="text" maxlength="12" placeholder="名前を入力" />
-          </label>
-          <button class="btn btn--primary" id="join-multiplayer" style="display: none;">参加</button>
-        </div>
-        <div class="control-bar__actions">
-          <button class="btn btn--primary" id="start-multiplayer">マルチプレイ開始</button>
-          <button class="btn btn--success" id="start-game" style="display: none;">ゲーム開始</button>
-          <button class="btn btn--ghost" id="leave-room" style="display: none;">退出</button>
-          <button class="btn btn--ghost" id="reset-room" style="display: none;">リセット</button>
-        </div>
-        <div class="lobby-status" id="online-status">準備中...</div>
-        <div class="lobby-players" id="online-players"></div>
-        <div class="rule-settings">
-          <p class="rule-settings__title">追加ルール</p>
-          <div class="rule-settings__list" id="rule-settings-online"></div>
-        </div>
-      </section>
+    <section class="mode-bar">
+      <button class="btn btn--ghost is-active" id="mode-local">ソロ</button>
+      <button class="btn btn--ghost" id="mode-online">オンライン</button>
+    </section>
 
-      <section class="table-layout">
-        <div class="seat seat--top-left" data-seat="top-left">
-          <div class="seat__name"></div>
-          <div class="seat__count"></div>
-          <div class="seat__hand"></div>
-        </div>
-        <div class="seat seat--top" data-seat="top">
-          <div class="seat__name"></div>
-          <div class="seat__count"></div>
-          <div class="seat__hand"></div>
-        </div>
-        <div class="seat seat--top-right" data-seat="top-right">
-          <div class="seat__name"></div>
-          <div class="seat__count"></div>
-          <div class="seat__hand"></div>
-        </div>
-
-        <div class="seat seat--left" data-seat="left">
-          <div class="seat__name"></div>
-          <div class="seat__count"></div>
-          <div class="seat__hand"></div>
-        </div>
-
-        <section class="field-area">
-          <div class="field-area__header">
-            <p class="section-title">場</p>
-            <p class="field-area__hint">出されたカード</p>
-          </div>
-          <div class="field-area__cards" id="field"></div>
-        </section>
-
-        <div class="seat seat--right" data-seat="right">
-          <div class="seat__name"></div>
-          <div class="seat__count"></div>
-          <div class="seat__hand"></div>
-        </div>
-
-        <div class="seat seat--bottom" data-seat="bottom">
-          <div class="seat__name"></div>
-          <div class="seat__count"></div>
-          <div class="seat__hand"></div>
-        </div>
-      </section>
-
-      <section class="message-area" id="message">あなたのターンです</section>
-      <div class="combo-hint" id="combo-hint" aria-live="polite"></div>
-
-      <section class="ranking-overlay" id="ranking-overlay" style="display: none;">
-        <div class="ranking-panel">
-          <h2 class="ranking-panel__title">結果発表</h2>
-          <div class="ranking-panel__list" id="ranking-list"></div>
-          <button class="btn btn--primary" id="ranking-close">ロビーに戻る</button>
-        </div>
-      </section>
-
-      <section class="player-area">
-        <p class="section-title">自分の手札</p>
-        <div class="card-row" id="player-hand"></div>
-        <section class="action-bar">
-          <button class="btn btn--primary" id="play-button">出す！</button>
-          <button class="btn btn--ghost" id="pass-button">パス</button>
-          <button class="btn btn--ghost btn--small" id="rules-button">ルール</button>
-        </section>
-      </section>
-    </div>
-
-    <div class="rules-overlay" id="rules-overlay" style="display: none;">
-      <div class="rules-panel">
-        <div class="rules-panel__header">
-          <h2 class="rules-panel__title">有効なローカルルール</h2>
-          <button class="btn btn--ghost btn--small" id="rules-close">&times;</button>
-        </div>
-        <div class="rules-panel__list" id="rules-list"></div>
+    <section class="control-bar" id="local-controls">
+      <label class="control-bar__label">
+        CPU人数
+        <select id="cpu-count">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </label>
+      <button class="btn btn--primary" id="start-button">ゲーム開始</button>
+      <div class="rule-settings">
+        <p class="rule-settings__title">追加ルール</p>
+        <div class="rule-settings__list" id="rule-settings-local"></div>
       </div>
-    </div>
+    </section>
 
-    <div class="effect-layer" id="effect-layer" aria-hidden="true">
-      <div class="effect-text" id="effect-text"></div>
-      <div class="effect-sub" id="effect-sub"></div>
-    </div>
+    <section class="control-bar control-bar--online is-hidden" id="online-controls">
+      <div class="control-bar__group">
+        <label class="control-bar__label">
+          名前
+          <input id="online-name" type="text" maxlength="12" placeholder="名前を入力" />
+        </label>
+        <button class="btn btn--primary" id="join-multiplayer" style="display: none;">参加</button>
+      </div>
+      <div class="control-bar__actions">
+        <button class="btn btn--primary" id="start-multiplayer">マルチプレイ開始</button>
+        <button class="btn btn--success" id="start-game" style="display: none;">ゲーム開始</button>
+        <button class="btn btn--ghost" id="leave-room" style="display: none;">退出</button>
+        <button class="btn btn--ghost" id="reset-room" style="display: none;">リセット</button>
+      </div>
+      <div class="lobby-status" id="online-status">準備中...</div>
+      <div class="lobby-players" id="online-players"></div>
+      <div class="rule-settings">
+        <p class="rule-settings__title">追加ルール</p>
+        <div class="rule-settings__list" id="rule-settings-online"></div>
+      </div>
+    </section>
 
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.min.js"></script>
-    <script type="module" src="./main.js"></script>
-  </body>
+    <section class="table-layout">
+      <div class="seat seat--top-left" data-seat="top-left">
+        <div class="seat__name"></div>
+        <div class="seat__count"></div>
+        <div class="seat__hand"></div>
+      </div>
+      <div class="seat seat--top" data-seat="top">
+        <div class="seat__name"></div>
+        <div class="seat__count"></div>
+        <div class="seat__hand"></div>
+      </div>
+      <div class="seat seat--top-right" data-seat="top-right">
+        <div class="seat__name"></div>
+        <div class="seat__count"></div>
+        <div class="seat__hand"></div>
+      </div>
+
+      <div class="seat seat--left" data-seat="left">
+        <div class="seat__name"></div>
+        <div class="seat__count"></div>
+        <div class="seat__hand"></div>
+      </div>
+
+      <section class="field-area">
+        <div class="field-area__header">
+          <p class="section-title">場</p>
+          <p class="field-area__hint">出されたカード</p>
+        </div>
+        <div class="field-area__cards" id="field"></div>
+      </section>
+
+      <div class="seat seat--right" data-seat="right">
+        <div class="seat__name"></div>
+        <div class="seat__count"></div>
+        <div class="seat__hand"></div>
+      </div>
+
+      <div class="seat seat--bottom" data-seat="bottom">
+        <div class="seat__name"></div>
+        <div class="seat__count"></div>
+        <div class="seat__hand"></div>
+      </div>
+    </section>
+
+    <section class="message-area" id="message">あなたのターンです</section>
+    <div class="combo-hint" id="combo-hint" aria-live="polite"></div>
+
+    <section class="ranking-overlay" id="ranking-overlay" style="display: none;">
+      <div class="ranking-panel">
+        <h2 class="ranking-panel__title">結果発表</h2>
+        <div class="ranking-panel__list" id="ranking-list"></div>
+        <button class="btn btn--primary" id="ranking-close">ロビーに戻る</button>
+      </div>
+    </section>
+
+    <section class="player-area">
+      <p class="section-title">自分の手札</p>
+      <div class="card-row" id="player-hand"></div>
+      <section class="action-bar">
+        <button class="btn btn--primary" id="play-button">出す！</button>
+        <button class="btn btn--ghost" id="pass-button">パス</button>
+        <button class="btn btn--ghost btn--small" id="rules-button">ルール</button>
+      </section>
+    </section>
+  </div>
+
+  <div class="rules-overlay" id="rules-overlay" style="display: none;">
+    <div class="rules-panel">
+      <div class="rules-panel__header">
+        <h2 class="rules-panel__title">有効なソロルール</h2>
+        <button class="btn btn--ghost btn--small" id="rules-close">&times;</button>
+      </div>
+      <div class="rules-panel__list" id="rules-list"></div>
+    </div>
+  </div>
+
+  <div class="effect-layer" id="effect-layer" aria-hidden="true">
+    <div class="effect-text" id="effect-text"></div>
+    <div class="effect-sub" id="effect-sub"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.min.js"></script>
+  <script type="module" src="./main.js"></script>
+</body>
+
 </html>
