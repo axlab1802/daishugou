@@ -84,7 +84,6 @@ def svg_for_card(layout: dict, rank_key: str, image_href: str) -> str:
   </g>
   <g transform=\"translate({rank_bottom['translateX']} {rank_bottom['translateY']}) rotate({rank_bottom['rotate']})\" font-family=\"Garamond, serif\" font-weight=\"700\" fill=\"{rank_color}\">
     <text x=\"{rank_bottom['x']}\" y=\"{rank_bottom['y']}\" font-size=\"{rank_bottom['fontSize']}\" text-anchor=\"{rank_bottom_anchor}\">{label}</text>
-    {rank_title_bottom_text}
   </g>
 
   <rect x=\"{frame['x']}\" y=\"{frame['y']}\" width=\"{frame['width']}\" height=\"{frame['height']}\" rx=\"{frame['radius']}\" fill=\"url(#frameWood)\" stroke=\"#3c2516\" stroke-width=\"4\" />
